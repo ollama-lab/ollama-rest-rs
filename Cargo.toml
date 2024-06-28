@@ -1,0 +1,10 @@
+[package]
+name = "ollama-rest"
+version = "0.1.0"
+edition = "2021"
+description = "Rust binding of Ollama RESTful API"
+authors = ["Charles Dong <chardon_cs@proton.me>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/chardoncs/ollama-rest-rs.git"
+
+[dependencies]
