@@ -8,3 +8,5 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/chardoncs/ollama-rest-rs.git"
 
 [dependencies]
+reqwest = { version = "0.12", features = ["json"] }
+tokio = { version = "1", features = ["net"] }
