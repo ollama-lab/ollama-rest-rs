@@ -1,14 +1,26 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+pub mod models;
+
+/// The Ollama object that encapsulates everything you need.
+pub struct Ollama {
+    host: String,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Ollama {
+    #[must_use]
+    pub fn new(host: &str) -> Self {
+        Self {
+            host: host.to_string(),
+        }
+    }
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    /// Get host info
+    pub fn host(&self) -> &str {
+        self.host.as_str()
+    }
+}
+
+impl Default for Ollama {
+    fn default() -> Self {
+        Self::new("127.0.0.1:11434")
     }
 }
