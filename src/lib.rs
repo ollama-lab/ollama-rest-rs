@@ -151,6 +151,14 @@ impl Ollama {
     }
 
     /// Create a blob
+    ///
+    /// ## Parameters
+    /// - `digest`: SHA256 digest of the blob
+    /// - `file`: Tokio File instance
+    ///
+    /// ## Returns
+    /// - `Ok(())`: Blob created
+    /// - `Err(_)`: Error occurred
     #[cfg(feature = "blob-creation")]
     pub async fn create_blob(&self, digest: &str, file: File) -> Result<(), Error> {
         let status = self.client.post(self.host.join(format!("/api/blobs/sha256:{}", digest).as_str())?)
@@ -159,7 +167,7 @@ impl Ollama {
             .await?
             .status();
 
-        if let StatusCode::OK = status {
+        if let StatusCode::CREATED = status {
             Ok(())
         } else {
             Err(Error::ErrorStatus(status))
@@ -186,6 +194,11 @@ impl Ollama {
     }
 
     /// Copy a model
+    ///
+    /// ## Returns
+    /// - `Ok(())`: Model copied
+    /// - `Err(Error::NotExists)`: Source model not exists
+    /// - `Err(_)`: Other error
     pub async fn copy_model(&self, request: &ModelCopyRequest) -> Result<(), Error> {
         let status = self.client.post(self.host.join("/api/copy")?)
             .json(request)
@@ -201,6 +214,11 @@ impl Ollama {
     }
 
     /// Delete a model
+    ///
+    /// ## Returns
+    /// - `Ok(())`: Model deleted
+    /// - `Err(Error::NotExists)`: Target model not exists
+    /// - `Err(_)`: Other error
     pub async fn delete_model(&self, request: &ModelDeletionRequest) -> Result<(), Error> {
         let status = self.client.delete(self.host.join("/api/delete")?)
             .json(request)
