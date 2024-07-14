@@ -8,8 +8,11 @@ use super::{errors::ParsingError, RequestFormat};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Role {
+    #[serde(rename = "system")]
     System,
+    #[serde(rename = "user")]
     User,
+    #[serde(rename = "assistant")]
     Assistant,
 }
 

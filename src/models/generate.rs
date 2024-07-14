@@ -8,7 +8,7 @@ use super::RequestFormat;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GenerationRequest {
     pub model: String,
-    pub prompt: Option<String>,
+    pub prompt: String,
     pub images: Option<Vec<String>>,
 
     pub format: Option<RequestFormat>,
