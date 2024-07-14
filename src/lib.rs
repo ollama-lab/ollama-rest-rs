@@ -58,6 +58,40 @@ macro_rules! streamed_request_wrapper {
 }
 
 /// The Ollama object that encapsulates everything you need.
+///
+/// ## Example
+///
+/// ### Use instance with default config
+///
+/// ```rust
+/// use ollama_rest::Ollama;
+///
+/// let ollama = Ollama::default();
+///
+/// // ...
+/// ```
+///
+/// ### Specify URL where Ollama serves
+///
+/// ```rust
+/// use ollama_rest::Ollama;
+/// use std::str::FromStr;
+///
+/// let ollama = Ollama::from_str("http://127.0.0.1:8080").unwrap();
+///
+/// // ...
+/// ```
+///
+/// ### Provide a Servo URL
+///
+/// ```rust
+/// use ollama_rest::Ollama;
+/// use std::str::FromStr;
+///
+/// let ollama = Ollama::new(url::Url::from_str("http://127.0.0.1:8080").unwrap()).unwrap();
+///
+/// // ...
+/// ```
 pub struct Ollama {
     host: Url,
     client: Client,
@@ -74,7 +108,7 @@ impl Ollama {
         })
     }
 
-    /// Get host info
+    /// Get host info as a str reference
     pub fn host(&self) -> &str {
         self.host.as_str()
     }
@@ -277,7 +311,7 @@ impl FromStr for Ollama {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new(Url::from_str(s).or_else(|err| Err(Error::UrlParsing(err)))?)
+        Self::new(Url::from_str(s)?)
     }
 }
 
