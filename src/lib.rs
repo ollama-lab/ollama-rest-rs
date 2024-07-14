@@ -2,7 +2,14 @@ use std::str::FromStr;
 
 use errors::Error;
 use futures_util::StreamExt;
-use models::{chat::{ChatRequest, ChatResponse}, create::CreationRequest, embeddings::{EmbeddingGenerationRequest, EmbeddingGenerationResponse}, generate::{GenerationRequest, GenerationResponse}, model::{ModelCopyRequest, ModelDeletionRequest, ModelListResponse, ModelPullStatusKind, ModelPushStatusKind, ModelShowRequest, ModelShowResponse, ModelSyncRequest, RunningModelResponse}, Status};
+use models::{
+    chat::{ChatRequest, ChatResponse},
+    create::CreationRequest,
+    embeddings::{EmbeddingGenerationRequest, EmbeddingGenerationResponse},
+    generate::{GenerationRequest, GenerationResponse},
+    model::*,
+    Status
+};
 use reqwest::{Client, ClientBuilder, StatusCode, Url};
 #[cfg(feature = "tokio/fs")]
 use tokio::fs::File;
