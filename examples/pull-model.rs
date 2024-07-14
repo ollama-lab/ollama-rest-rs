@@ -14,7 +14,7 @@ async fn main() {
     ollama.pull_model(&serde_json::from_value::<ModelSyncRequest>(serde_json::json!({
         "name": MODEL_NAME,
     })).unwrap(), Some(|res: &ModelPullStatus| {
-        if &res.status[..] != prev_status.as_str() {
+        if !res.status.starts_with(prev_status.as_str()) {
             prev_status = res.status.clone();
             println!("\n{}", res.status);
         }
