@@ -13,7 +13,6 @@ use models::{
     Status
 };
 use reqwest::{Client, ClientBuilder, StatusCode, Url};
-#[cfg(feature = "tokio/fs")]
 use tokio::fs::File;
 
 pub mod errors;
@@ -175,7 +174,6 @@ impl Ollama {
     /// ## Returns
     /// - `Ok(())`: Blob created
     /// - `Err(_)`: Error occurred
-    #[cfg(feature = "blob-creation")]
     pub async fn create_blob(&self, digest: &str, file: File) -> Result<(), Error> {
         let status = self.client.post(self.host.join(format!("/api/blobs/sha256:{}", digest).as_str())?)
             .body(file)
