@@ -117,12 +117,12 @@ impl Ollama {
     }
 
     streamed_request_wrapper! {
-        #[doc = "Generate one-shot completion response from one prompt. It can be a completion."]
+        #[doc = "Generate completion response from one prompt. It can be a completion."]
         pub fn generate("/api/generate", GenerationRequest) -> GenerationResponse
     }
 
     streamed_request_wrapper! {
-        #[doc = "Generate multishot completion response from chat history"]
+        #[doc = "Generate completion response from chat history"]
         pub fn chat("/api/chat", ChatRequest) -> ChatResponse
     }
 

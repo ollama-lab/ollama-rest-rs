@@ -4,7 +4,7 @@ use serde_json::{Map, Value};
 
 use super::RequestFormat;
 
-/// One-shot completion JSON request
+/// Completion JSON request
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GenerationRequest {
     pub model: String,
@@ -22,7 +22,7 @@ pub struct GenerationRequest {
     pub keep_alive: Option<String>,
 }
 
-/// One-shot completion JSON response
+/// Completion JSON response
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GenerationResponse {
     pub model: String,

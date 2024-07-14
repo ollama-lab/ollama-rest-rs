@@ -46,7 +46,7 @@ pub struct Message {
     pub images: Option<Vec<String>>,
 }
 
-/// Multishot completion request
+/// Chat completion request
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatRequest {
     pub model: String,
@@ -58,7 +58,7 @@ pub struct ChatRequest {
     pub keep_alive: Option<String>,
 }
 
-/// Multishot completion response
+/// Chat completion response
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatResponse {
     pub model: String,
