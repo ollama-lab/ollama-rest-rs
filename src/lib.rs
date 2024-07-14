@@ -121,7 +121,7 @@ impl Ollama {
         if let StatusCode::OK = status {
             Ok(())
         } else {
-            Err(Error::ErrorStatus(status.as_u16()))
+            Err(Error::ErrorStatus(status))
         }
     }
 
