@@ -131,6 +131,19 @@ impl Ollama {
         pub fn create("/api/create", CreationRequest) -> Status
     }
 
+    /// Load a model
+    ///
+    /// It calls `/api/generate` with no prompt, which makes Ollama to load
+    /// the model.
+    pub async fn load_model(&self, model: &str) -> Result<GenerationResponse, Error> {
+        Ok(self.client.post(self.host.join("/api/generate")?)
+            .json(&serde_json::json!({ "model": model }))
+            .send()
+            .await?
+            .json::<GenerationResponse>()
+            .await?)
+    }
+
     /// Check if blob exists on the server side (not ollama.com)
     ///
     /// ## Parameters
