@@ -6,6 +6,12 @@ using [reqwest](https://github.com/seanmonstar/reqwest),
 [serde](https://serde.rs/),
 and [chrono](https://github.com/chronotope/chrono).
 
+## Install
+
+```bash
+cargo add ollama-rest@0.1
+```
+
 ## At a glance
 
 > See [source](./examples/one-time-chat.rs) of this example.
