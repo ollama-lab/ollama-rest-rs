@@ -18,6 +18,7 @@ pub enum RequestFormat {
     /// JSON
     ///
     /// Currently the one and only format support by Ollama
+    #[serde(rename = "json")]
     Json,
 }
 
