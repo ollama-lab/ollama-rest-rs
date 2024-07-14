@@ -250,7 +250,7 @@ impl Ollama {
     /// Pull a model
     pub async fn pull_model<T>(&self, request: &ModelSyncRequest, mut on_stream: Option<T>) -> Result<Status, Error>
     where 
-        T: FnMut(&ModelPullStatusKind),
+        T: FnMut(&ModelPullStatus),
     {
         let res = self.client.post(self.host.join("/api/pull")?)
             .json(request)
@@ -267,12 +267,10 @@ impl Ollama {
                 while let Some(result) = stream.next().await {
                     let bytes = result?;
 
-                    let cur_res = serde_json::from_slice::<ModelPullStatusKind>(&bytes)?;
+                    let cur_res = serde_json::from_slice::<ModelPullStatus>(&bytes)?;
                     f(&cur_res);
 
-                    if let ModelPullStatusKind::Message(cur_res) = cur_res {
-                        final_res = Some(cur_res);
-                    }
+                    final_res = Some(Status { status: cur_res.status });
                 }
             }
 
@@ -286,7 +284,7 @@ impl Ollama {
     /// Push a model
     pub async fn push_model<T>(&self, request: &ModelSyncRequest, mut on_stream: Option<T>) -> Result<Status, Error>
     where 
-        T: FnMut(&ModelPushStatusKind),
+        T: FnMut(&ModelPushStatus),
     {
         let res = self.client.post(self.host.join("/api/push")?)
             .json(request)
@@ -303,12 +301,10 @@ impl Ollama {
                 while let Some(result) = stream.next().await {
                     let bytes = result?;
 
-                    let cur_res = serde_json::from_slice::<ModelPushStatusKind>(&bytes)?;
+                    let cur_res = serde_json::from_slice::<ModelPushStatus>(&bytes)?;
                     f(&cur_res);
 
-                    if let ModelPushStatusKind::Message(cur_res) = cur_res {
-                        final_res = Some(cur_res);
-                    }
+                    final_res = Some(Status { status: cur_res.status });
                 }
             }
 

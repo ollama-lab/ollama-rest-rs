@@ -2,8 +2,6 @@ use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use serde_json::Map;
 
-use super::Status;
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ModelDetails {
     pub parent_model: Option<String>,
@@ -65,31 +63,29 @@ pub struct ModelSyncRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ModelDownloadStatus {
-    pub status: String,
     pub digest: String,
     pub total: usize,
-    pub completed: usize,
+    pub completed: Option<usize>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum ModelPullStatusKind {
-    Message(Status),
-    Downloading(ModelDownloadStatus),
+pub struct ModelPullStatus {
+    pub status: String,
+    #[serde(flatten)]
+    pub download_info: Option<ModelDownloadStatus>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ModelUploadStatus {
-    pub status: String,
     pub digest: String,
     pub total: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum ModelPushStatusKind {
-    Message(Status),
-    Uploading(ModelUploadStatus),
+pub struct ModelPushStatus {
+    pub status: String,
+    #[serde(flatten)]
+    pub upload_info: Option<ModelUploadStatus>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
