@@ -109,6 +109,7 @@ impl Ollama {
         }
     }
 
+    /// Create a blob
     #[cfg(feature = "blob-creation")]
     pub async fn create_blob(&self, digest: &str, file: File) -> Result<(), Error> {
         let status = self.client.post(self.host.join(format!("/api/blobs/sha256:{}", digest).as_str())?)
