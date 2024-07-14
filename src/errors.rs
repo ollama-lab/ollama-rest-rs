@@ -1,3 +1,5 @@
+//! Error module
+
 use reqwest::StatusCode;
 
 #[derive(Debug)]

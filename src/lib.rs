@@ -1,3 +1,5 @@
+//! Asynchronous Rust bindings of Ollama REST API.
+
 use std::str::FromStr;
 
 use errors::Error;
@@ -16,6 +18,7 @@ use tokio::fs::File;
 
 pub mod errors;
 pub mod models;
+pub mod prelude;
 
 macro_rules! streamed_request_wrapper {
     {
@@ -57,11 +60,11 @@ macro_rules! streamed_request_wrapper {
     };
 }
 
-/// The Ollama object that encapsulates everything you need.
+/// The Ollama instance encapsulating everything you need.
 ///
-/// ## Example
+/// ## Examples
 ///
-/// ### Use instance with default config
+/// ### Use instance with default configuration
 ///
 /// ```rust
 /// use ollama_rest::Ollama;
@@ -71,7 +74,7 @@ macro_rules! streamed_request_wrapper {
 /// // ...
 /// ```
 ///
-/// ### Specify URL where Ollama serves
+/// ### Specify a URL where Ollama serves
 ///
 /// ```rust
 /// use ollama_rest::Ollama;

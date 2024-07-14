@@ -1,3 +1,5 @@
+//! Serde models
+
 use std::{fmt::Display, str::FromStr};
 
 use errors::ParsingError;
