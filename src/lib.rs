@@ -1,11 +1,54 @@
 use std::str::FromStr;
 
 use errors::Error;
-use models::{chat::{ChatRequest, ChatResponse}, generate::{GenerateRequest, GenerateResponse}};
-use reqwest::{Client, ClientBuilder, Url};
+use futures_util::StreamExt;
+use models::{chat::{ChatRequest, ChatResponse}, create::CreationRequest, embeddings::{EmbeddingGenerationRequest, EmbeddingGenerationResponse}, generate::{GenerationRequest, GenerationResponse}, model::{ModelCopyRequest, ModelDeletionRequest, ModelListResponse, ModelPullStatusKind, ModelPushStatusKind, ModelShowRequest, ModelShowResponse, ModelSyncRequest, RunningModelResponse}, Status};
+use reqwest::{Client, ClientBuilder, StatusCode, Url};
+#[cfg(feature = "tokio/fs")]
+use tokio::fs::File;
 
 pub mod errors;
 pub mod models;
+
+macro_rules! streamed_request_wrapper {
+    {
+        $(#[$attr:meta])*
+        $($kw:ident)? fn $func_name:ident($pathname:literal, $req_ty:ty) -> $res_ty:ty$(;)?
+    } => {
+        $(#[$attr])*
+        $($kw)? async fn $func_name<T>(&self, request: &$req_ty, mut on_stream: Option<T>) -> Result<$res_ty, errors::Error>
+        where 
+            T: FnMut(&$res_ty)
+        {
+            let res = self.client.post(self.host.join($pathname)?)
+                .json(request)
+                .send()
+                .await?;
+
+            if request.stream.unwrap_or(true) {
+                // Handle streamed response
+                let mut stream = res.bytes_stream();
+
+                let mut final_res: Option<$res_ty> = None;
+
+                if let Some(ref mut f) = on_stream {
+                    while let Some(result) = stream.next().await {
+                        let bytes = result?;
+
+                        let cur_res = serde_json::from_slice::<$res_ty>(&bytes)?;
+                        f(&cur_res);
+                        final_res = Some(cur_res);
+                    }
+                }
+
+                final_res.ok_or(if on_stream.is_some() { Error::EmptyResponse } else { Error::NoCallback })
+            } else {
+                // Handle normal response
+                Ok(res.json::<$res_ty>().await?)
+            }
+        }
+    };
+}
 
 /// The Ollama object that encapsulates everything you need.
 pub struct Ollama {
@@ -29,46 +72,196 @@ impl Ollama {
         self.host.as_str()
     }
 
-    /// Generate response from one prompt
-    pub async fn generate<T>(&self, request: &GenerateRequest, mut on_stream: Option<T>) -> Result<GenerateResponse, Error>
+    streamed_request_wrapper! {
+        #[doc = "Generate one-shot completion response from one prompt. It can be a completion."]
+        pub fn generate("/api/generate", GenerationRequest) -> GenerationResponse
+    }
+
+    streamed_request_wrapper! {
+        #[doc = "Generate multishot completion response from chat history"]
+        pub fn chat("/api/chat", ChatRequest) -> ChatResponse
+    }
+
+    streamed_request_wrapper! {
+        #[doc = "Create a model"]
+        pub fn create("/api/create", CreationRequest) -> Status
+    }
+
+    /// Check if blob exists on the server side (not ollama.com)
+    ///
+    /// ## Parameters
+    /// - `digest`: SHA256 digest of the blob
+    ///
+    /// ## Returns
+    /// - `Ok(())`: Blob exists
+    /// - `Err(Error::NotExists)`: Blob not exists
+    /// - `Err(_)`: Other error
+    pub async fn blob_exists(&self, digest: &str) -> Result<(), Error> {
+        let status = self.client.head(self.host.join(format!("/api/blobs/sha256:{}", digest).as_str())?)
+            .send()
+            .await?
+            .status();
+
+        match status {
+            StatusCode::OK => Ok(()),
+            StatusCode::NOT_FOUND => Err(Error::NotExists),
+            status => Err(Error::ErrorStatus(status)),
+        }
+    }
+
+    #[cfg(feature = "blob-creation")]
+    pub async fn create_blob(&self, digest: &str, file: File) -> Result<(), Error> {
+        let status = self.client.post(self.host.join(format!("/api/blobs/sha256:{}", digest).as_str())?)
+            .body(file)
+            .send()
+            .await?
+            .status();
+
+        if let StatusCode::OK = status {
+            Ok(())
+        } else {
+            Err(Error::ErrorStatus(status.as_u16()))
+        }
+    }
+
+    /// List local models
+    pub async fn local_models(&self) -> Result<ModelListResponse, Error> {
+        Ok(self.client.get(self.host.join("/api/tags")?)
+            .send()
+            .await?
+            .json::<ModelListResponse>()
+            .await?)
+    }
+
+    /// Show model information
+    pub async fn model(&self, request: &ModelShowRequest) -> Result<ModelShowResponse, Error> {
+        Ok(self.client.post(self.host.join("/api/show")?)
+            .json(request)
+            .send()
+            .await?
+            .json::<ModelShowResponse>()
+            .await?)
+    }
+
+    /// Copy a model
+    pub async fn copy_model(&self, request: &ModelCopyRequest) -> Result<(), Error> {
+        let status = self.client.post(self.host.join("/api/copy")?)
+            .json(request)
+            .send()
+            .await?
+            .status();
+
+        match status {
+            StatusCode::OK => Ok(()),
+            StatusCode::NOT_FOUND => Err(Error::NotExists),
+            status => Err(Error::ErrorStatus(status)),
+        }
+    }
+
+    /// Delete a model
+    pub async fn delete_model(&self, request: &ModelDeletionRequest) -> Result<(), Error> {
+        let status = self.client.delete(self.host.join("/api/delete")?)
+            .json(request)
+            .send()
+            .await?
+            .status();
+
+        match status {
+            StatusCode::OK => Ok(()),
+            StatusCode::NOT_FOUND => Err(Error::NotExists),
+            status => Err(Error::ErrorStatus(status)),
+        }
+    }
+
+    /// Pull a model
+    pub async fn pull_model<T>(&self, request: &ModelSyncRequest, mut on_stream: Option<T>) -> Result<Status, Error>
     where 
-        T: FnMut(GenerateResponse)
+        T: FnMut(&ModelPullStatusKind),
     {
-        let res = self.client.post(self.host.join("/api/generate")?)
+        let res = self.client.post(self.host.join("/api/pull")?)
             .json(request)
             .send()
             .await?;
 
         if request.stream.unwrap_or(true) {
+            // Handle streamed response
             let mut stream = res.bytes_stream();
 
-            let mut final_res: Option<GenerateResponse> = None;
+            let mut final_res: Option<Status> = None;
 
-            if let Some(f) = on_stream {
-                while let Some(item) = stream.next().await {
-                    final_res = Some(item);
-                    f(item);
+            if let Some(ref mut f) = on_stream {
+                while let Some(result) = stream.next().await {
+                    let bytes = result?;
+
+                    let cur_res = serde_json::from_slice::<ModelPullStatusKind>(&bytes)?;
+                    f(&cur_res);
+
+                    if let ModelPullStatusKind::Message(cur_res) = cur_res {
+                        final_res = Some(cur_res);
+                    }
                 }
             }
 
-            todo!();
-            final_res.ok_or(Err(Error::Event))
+            final_res.ok_or(if on_stream.is_some() { Error::EmptyResponse } else { Error::NoCallback })
         } else {
-            res.json::<GenerateResponse>()
-                .await?;
+            // Handle normal response
+            Ok(res.json::<Status>().await?)
         }
     }
 
-    /// Generate next response from chat memory
-    pub async fn chat(&self, request: &ChatRequest) -> Result<ChatResponse, Error> {
-        Ok(
-            self.client.post(self.host.join("/api/chat")?)
-                .json(request)
-                .send()
-                .await?
-                .json::<ChatResponse>()
-                .await?
-        )
+    /// Push a model
+    pub async fn push_model<T>(&self, request: &ModelSyncRequest, mut on_stream: Option<T>) -> Result<Status, Error>
+    where 
+        T: FnMut(&ModelPushStatusKind),
+    {
+        let res = self.client.post(self.host.join("/api/push")?)
+            .json(request)
+            .send()
+            .await?;
+
+        if request.stream.unwrap_or(true) {
+            // Handle streamed response
+            let mut stream = res.bytes_stream();
+
+            let mut final_res: Option<Status> = None;
+
+            if let Some(ref mut f) = on_stream {
+                while let Some(result) = stream.next().await {
+                    let bytes = result?;
+
+                    let cur_res = serde_json::from_slice::<ModelPushStatusKind>(&bytes)?;
+                    f(&cur_res);
+
+                    if let ModelPushStatusKind::Message(cur_res) = cur_res {
+                        final_res = Some(cur_res);
+                    }
+                }
+            }
+
+            final_res.ok_or(if on_stream.is_some() { Error::EmptyResponse } else { Error::NoCallback })
+        } else {
+            // Handle normal response
+            Ok(res.json::<Status>().await?)
+        }
+    }
+
+    /// Generate embeddings
+    pub async fn generate_embeddings(&self, request: &EmbeddingGenerationRequest) -> Result<EmbeddingGenerationResponse, Error> {
+        Ok(self.client.post(self.host.join("/api/embeddings")?)
+            .json(request)
+            .send()
+            .await?
+            .json::<EmbeddingGenerationResponse>()
+            .await?)
+    }
+
+    /// List running models
+    pub async fn running_models(&self) -> Result<RunningModelResponse, Error> {
+        Ok(self.client.get(self.host.join("/api/ps")?)
+            .send()
+            .await?
+            .json::<RunningModelResponse>()
+            .await?)
     }
 }
 

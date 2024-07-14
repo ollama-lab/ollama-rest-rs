@@ -2,6 +2,7 @@ use std::{fmt::Display, str::FromStr};
 
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 
 use super::{errors::ParsingError, RequestFormat};
 
@@ -42,17 +43,19 @@ pub struct Message {
     pub images: Option<Vec<String>>,
 }
 
+/// Multishot completion request
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatRequest {
     pub model: String,
     pub messages: Vec<Message>,
     
     pub format: Option<RequestFormat>,
-    // TODO: Modelfile support
+    pub options: Option<Map<String, Value>>,
     pub stream: Option<bool>,
     pub keep_alive: Option<String>,
 }
 
+/// Multishot completion response
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatResponse {
     pub model: String,

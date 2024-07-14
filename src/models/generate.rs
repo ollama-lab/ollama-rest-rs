@@ -1,23 +1,30 @@
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
 
 use super::RequestFormat;
 
+/// One-shot completion JSON request
 #[derive(Debug, Serialize, Deserialize)]
-pub struct GenerateRequest {
+pub struct GenerationRequest {
     pub model: String,
-    pub prompt: String,
+    pub prompt: Option<String>,
     pub images: Option<Vec<String>>,
 
     pub format: Option<RequestFormat>,
-    // TODO: Modelfile support
+
+    pub options: Option<Map<String, Value>>,
+    pub system: Option<String>,
+    pub template: Option<String>,
+
     pub stream: Option<bool>,
     pub raw: Option<bool>,
     pub keep_alive: Option<String>,
 }
 
+/// One-shot completion JSON response
 #[derive(Debug, Serialize, Deserialize)]
-pub struct GenerateResponse {
+pub struct GenerationResponse {
     pub model: String,
     pub created_at: DateTime<Local>,
     pub response: String,
