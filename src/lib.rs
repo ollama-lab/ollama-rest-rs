@@ -3,7 +3,7 @@
 use std::str::FromStr;
 
 use errors::Error;
-use futures_util::StreamExt;
+use futures::{Stream, StreamExt};
 use models::{
     chat::{ChatRequest, ChatResponse},
     create::CreationRequest,
@@ -21,41 +21,76 @@ pub mod prelude;
 
 macro_rules! streamed_request_wrapper {
     {
-        $(#[$attr:meta])*
-        $($kw:ident)? fn $func_name:ident($pathname:literal, $req_ty:ty) -> $res_ty:ty$(;)?
+        $(
+            $(#[$attr:meta])*
+            $($kw:ident)? fn $func_name:ident($pathname:literal, $req_ty:ty) -> $res_ty:ty
+            $(=> streamed as [
+                $(#[$attr2:meta])*
+                $($kw2:ident)? fn $streamed_func_name:ident
+            ])?
+        );*
+        $(;)?
     } => {
-        $(#[$attr])*
-        $($kw)? async fn $func_name<T>(&self, request: &$req_ty, mut on_stream: Option<T>) -> Result<$res_ty, errors::Error>
-        where 
-            T: FnMut(&$res_ty)
-        {
-            let res = self.client.post(self.host.join($pathname)?)
-                .json(request)
-                .send()
-                .await?;
+        $(
+            $(#[$attr])*
+            $($kw)? async fn $func_name<T>(&self, request: &$req_ty, mut on_stream: Option<T>) -> Result<$res_ty, Error>
+            where 
+                T: FnMut(&$res_ty)
+            {
+                let res = self.client.post(self.host.join($pathname)?)
+                    .json(request)
+                    .send()
+                    .await?;
 
-            if request.stream.unwrap_or(true) {
-                // Handle streamed response
-                let mut stream = res.bytes_stream();
+                if request.stream.unwrap_or(true) {
+                    // Handle streamed response
+                    let mut stream = res.bytes_stream();
 
-                let mut final_res: Option<$res_ty> = None;
+                    let mut final_res: Option<$res_ty> = None;
 
-                if let Some(ref mut f) = on_stream {
-                    while let Some(result) = stream.next().await {
-                        let bytes = result?;
+                    if let Some(ref mut f) = on_stream {
+                        while let Some(result) = stream.next().await {
+                            let bytes = result?;
 
-                        let cur_res = serde_json::from_slice::<$res_ty>(&bytes)?;
-                        f(&cur_res);
-                        final_res = Some(cur_res);
+                            let cur_res = serde_json::from_slice::<$res_ty>(&bytes)?;
+                            f(&cur_res);
+                            final_res = Some(cur_res);
+                        }
                     }
+
+                    final_res.ok_or(if on_stream.is_some() { Error::EmptyResponse } else { Error::NoCallback })
+                } else {
+                    // Handle normal response
+                    Ok(res.json::<$res_ty>().await?)
+                }
+            }
+
+            $(
+                $(#[$attr2])*
+                $($kw2)? async fn $streamed_func_name<T>(&self, request: &$req_ty) -> Result<impl Stream<Item = Result<$res_ty, Error>>, Error> {
+                    if !request.stream.unwrap_or(true) {
+                        return Err(Error::StreamingOff);
+                    }
+
+                    let res = self.client.post(self.host.join($pathname)?)
+                        .json(request)
+                        .send()
+                        .await?;
+
+                    Ok(
+                        res.bytes_stream()
+                        .map(|result| {
+                            result.map_err(|err| Error::from(err))
+                                .and_then(|ref bytes| {
+                                    serde_json::from_slice::<$res_ty>(bytes)
+                                        .map_err(|err| Error::from(err))
+                                })
+                        })
+                    )
                 }
 
-                final_res.ok_or(if on_stream.is_some() { Error::EmptyResponse } else { Error::NoCallback })
-            } else {
-                // Handle normal response
-                Ok(res.json::<$res_ty>().await?)
-            }
-        }
+            )?
+        )*
     };
 }
 
@@ -118,16 +153,24 @@ impl Ollama {
     streamed_request_wrapper! {
         #[doc = "Generate completion response from one prompt. It can be a completion."]
         pub fn generate("/api/generate", GenerationRequest) -> GenerationResponse
-    }
+            => streamed as [
+                #[doc = "Generate completion response from one prompt. It can be a completion."]
+                pub fn generate_streamed
+            ];
 
-    streamed_request_wrapper! {
         #[doc = "Generate completion response from chat history"]
         pub fn chat("/api/chat", ChatRequest) -> ChatResponse
-    }
+            => streamed as [
+                #[doc = "Generate completion response from chat history"]
+                pub fn chat_streamed
+            ];
 
-    streamed_request_wrapper! {
-        #[doc = "Create a model"]
+        #[doc = "create a model"]
         pub fn create("/api/create", CreationRequest) -> Status
+            => streamed as [
+                #[doc = "create a model"]
+                pub fn create_streamed
+            ];
     }
 
     /// Load a model

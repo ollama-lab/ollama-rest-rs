@@ -10,6 +10,7 @@ pub enum Error {
     Event,
     NoCallback,
     NotExists,
+    StreamingOff,
     UrlParsing(url::ParseError),
     JsonDecoding(serde_json::Error),
 }
