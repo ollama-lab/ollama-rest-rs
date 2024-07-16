@@ -1,3 +1,5 @@
+//! Completion streaming using Callback API
+//!
 //! In this example, you should see a streamed text output from your local LLM,
 //! just like you saw on ChatGPT =)
 

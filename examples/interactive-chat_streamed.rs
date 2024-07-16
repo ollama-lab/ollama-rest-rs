@@ -1,9 +1,10 @@
-//! Interactive chat streaming using Callback API
+//! Interactive chat streaming using Stream API
 //!
 //! Your LLM might mention the "previous talk" in this chat!
 
 use std::io::{BufRead, Write};
 
+use futures::StreamExt;
 use ollama_rest::{prelude::*, Ollama};
 use serde_json::json;
 
@@ -50,19 +51,23 @@ async fn main() {
         println!();
 
         // Send conversation to the LLM
-        ollama.chat(&serde_json::from_value::<ChatRequest>(json!({
-            "model": MODEL_NAME,
-            "messages": messages,
-        })).unwrap(), Some(|res: &ChatResponse| {
+        let mut stream = ollama.chat_streamed(
+            &serde_json::from_value::<ChatRequest>(json!({
+                "model": MODEL_NAME,
+                "messages": messages,
+            })
+        ).unwrap()).await.unwrap();
+
+        while let Some(Ok(res)) = stream.next().await {
             if !res.done {
                 if let Some(msg) = &res.message {
                     print!("{}", msg.content);
                     stdout.flush().unwrap();
-                    
+
                     completion.push_str(msg.content.as_str());
                 }
             }
-        })).await.unwrap();
+        }
 
         println!();
 
