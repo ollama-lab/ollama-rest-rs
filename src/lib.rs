@@ -67,7 +67,7 @@ macro_rules! streamed_request_wrapper {
 
             $(
                 $(#[$attr2])*
-                $($kw2)? async fn $streamed_func_name<T>(&self, request: &$req_ty) -> Result<impl Stream<Item = Result<$res_ty, Error>>, Error> {
+                $($kw2)? async fn $streamed_func_name(&self, request: &$req_ty) -> Result<impl Stream<Item = Result<$res_ty, Error>>, Error> {
                     if !request.stream.unwrap_or(true) {
                         return Err(Error::StreamingOff);
                     }
