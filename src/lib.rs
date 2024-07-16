@@ -92,6 +92,71 @@ macro_rules! streamed_request_wrapper {
             )?
         )*
     };
+
+    {
+        @nocheck
+        $(
+            $(#[$attr:meta])*
+            $($kw:ident)? fn $func_name:ident($pathname:literal, $req_ty:ty) -> $res_ty:ty
+            $(=> streamed as [
+                $(#[$attr2:meta])*
+                $($kw2:ident)? fn $streamed_func_name:ident
+            ])?
+        );*
+        $(;)?
+    } => {
+        $(
+            $(#[$attr])*
+            $($kw)? async fn $func_name<T>(&self, request: &$req_ty, mut on_stream: Option<T>) -> Result<$res_ty, Error>
+            where 
+                T: FnMut(&$res_ty)
+            {
+                let res = self.client.post(self.host.join($pathname)?)
+                    .json(request)
+                    .send()
+                    .await?;
+
+                // Handle streamed response
+                let mut stream = res.bytes_stream();
+
+                let mut final_res: Option<$res_ty> = None;
+
+                if let Some(ref mut f) = on_stream {
+                    while let Some(result) = stream.next().await {
+                        let bytes = result?;
+
+                        let cur_res = serde_json::from_slice::<$res_ty>(&bytes)?;
+                        f(&cur_res);
+                        final_res = Some(cur_res);
+                    }
+                }
+
+                final_res.ok_or(if on_stream.is_some() { Error::EmptyResponse } else { Error::NoCallback })
+            }
+
+            $(
+                $(#[$attr2])*
+                $($kw2)? async fn $streamed_func_name(&self, request: &$req_ty) -> Result<impl Stream<Item = Result<$res_ty, Error>>, Error> {
+                    let res = self.client.post(self.host.join($pathname)?)
+                        .json(request)
+                        .send()
+                        .await?;
+
+                    Ok(
+                        res.bytes_stream()
+                        .map(|result| {
+                            result.map_err(|err| Error::from(err))
+                                .and_then(|ref bytes| {
+                                    serde_json::from_slice::<$res_ty>(bytes)
+                                        .map_err(|err| Error::from(err))
+                                })
+                        })
+                    )
+                }
+
+            )?
+        )*
+    };
 }
 
 /// The Ollama instance encapsulating everything you need.
@@ -290,72 +355,20 @@ impl Ollama {
         }
     }
 
-    /// Pull a model
-    pub async fn pull_model<T>(&self, request: &ModelSyncRequest, mut on_stream: Option<T>) -> Result<Status, Error>
-    where 
-        T: FnMut(&ModelPullStatus),
-    {
-        let res = self.client.post(self.host.join("/api/pull")?)
-            .json(request)
-            .send()
-            .await?;
+    streamed_request_wrapper! {
+        @nocheck
 
-        if request.stream.unwrap_or(true) {
-            // Handle streamed response
-            let mut stream = res.bytes_stream();
+        #[doc = "Pull a model"]
+        pub fn pull_model("/api/pull", ModelSyncRequest) -> ModelPullStatus
+            => streamed as [
+                pub fn pull_model_streamed
+            ];
 
-            let mut final_res: Option<Status> = None;
-
-            if let Some(ref mut f) = on_stream {
-                while let Some(result) = stream.next().await {
-                    let bytes = result?;
-
-                    let cur_res = serde_json::from_slice::<ModelPullStatus>(&bytes)?;
-                    f(&cur_res);
-
-                    final_res = Some(Status { status: cur_res.status });
-                }
-            }
-
-            final_res.ok_or(if on_stream.is_some() { Error::EmptyResponse } else { Error::NoCallback })
-        } else {
-            // Handle normal response
-            Ok(res.json::<Status>().await?)
-        }
-    }
-
-    /// Push a model
-    pub async fn push_model<T>(&self, request: &ModelSyncRequest, mut on_stream: Option<T>) -> Result<Status, Error>
-    where 
-        T: FnMut(&ModelPushStatus),
-    {
-        let res = self.client.post(self.host.join("/api/push")?)
-            .json(request)
-            .send()
-            .await?;
-
-        if request.stream.unwrap_or(true) {
-            // Handle streamed response
-            let mut stream = res.bytes_stream();
-
-            let mut final_res: Option<Status> = None;
-
-            if let Some(ref mut f) = on_stream {
-                while let Some(result) = stream.next().await {
-                    let bytes = result?;
-
-                    let cur_res = serde_json::from_slice::<ModelPushStatus>(&bytes)?;
-                    f(&cur_res);
-
-                    final_res = Some(Status { status: cur_res.status });
-                }
-            }
-
-            final_res.ok_or(if on_stream.is_some() { Error::EmptyResponse } else { Error::NoCallback })
-        } else {
-            // Handle normal response
-            Ok(res.json::<Status>().await?)
-        }
+        #[doc = "Push a model"]
+        pub fn push_model("/api/push", ModelSyncRequest) -> ModelPushStatus
+            => streamed as [
+                pub fn push_model_streamed
+            ];
     }
 
     /// Generate embeddings
