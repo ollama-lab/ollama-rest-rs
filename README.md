@@ -1,4 +1,4 @@
-# Ollama-REST.rs
+# ollama-rest.rs
 
 Asynchronous Rust bindings of Ollama REST API,
 using [reqwest](https://github.com/seanmonstar/reqwest),
