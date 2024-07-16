@@ -216,24 +216,24 @@ impl Ollama {
     }
 
     streamed_request_wrapper! {
-        #[doc = "Generate completion response from one prompt. It can be a completion."]
+        #[doc = "Generate completion response for one single prompt (Callback API)"]
         pub fn generate("/api/generate", GenerationRequest) -> GenerationResponse
             => streamed as [
-                #[doc = "Generate completion response from one prompt. It can be a completion."]
+                #[doc = "Generate completion response for one single prompt (Stream API)"]
                 pub fn generate_streamed
             ];
 
-        #[doc = "Generate completion response from chat history"]
+        #[doc = "Generate completion response from chat history (Callback API)"]
         pub fn chat("/api/chat", ChatRequest) -> ChatResponse
             => streamed as [
-                #[doc = "Generate completion response from chat history"]
+                #[doc = "Generate completion response from chat history (Stream API)"]
                 pub fn chat_streamed
             ];
 
-        #[doc = "create a model"]
+        #[doc = "create a model (Callback API)"]
         pub fn create("/api/create", CreationRequest) -> Status
             => streamed as [
-                #[doc = "create a model"]
+                #[doc = "create a model (Stream API)"]
                 pub fn create_streamed
             ];
     }
@@ -358,15 +358,17 @@ impl Ollama {
     streamed_request_wrapper! {
         @nocheck
 
-        #[doc = "Pull a model"]
+        #[doc = "Pull a model (Callback API)"]
         pub fn pull_model("/api/pull", ModelSyncRequest) -> ModelPullStatus
             => streamed as [
+                #[doc = "Pull a model (Stream API)"]
                 pub fn pull_model_streamed
             ];
 
-        #[doc = "Push a model"]
+        #[doc = "Push a model (Callback API)"]
         pub fn push_model("/api/push", ModelSyncRequest) -> ModelPushStatus
             => streamed as [
+                #[doc = "Push a model (Stream API)"]
                 pub fn push_model_streamed
             ];
     }
