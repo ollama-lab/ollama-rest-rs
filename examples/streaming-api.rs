@@ -19,6 +19,21 @@ async fn main() {
     let app = Router::new()
         .route("/", post(chat));
 
+    let listener = TcpListener::bind(HOST_ADDR).await.unwrap();
+
+    print_help_text();
+
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn chat(Json(payload): Json<ChatRequest>) -> Sse<impl Stream<Item = Result<Event, Error>>> {
+    Sse::new(
+        API.chat_streamed(&payload).await.unwrap()
+            .map_ok(|res| Event::default().json_data(res).unwrap()),
+    )
+}
+
+fn print_help_text() {
     println!("Server listening at {HOST_ADDR}. Press Ctrl+C to exit.");
     println!();
     println!(r#"===
@@ -38,15 +53,4 @@ curl -X POST http://127.0.0.1:9890/ -H 'Content-Type: application/json' -d '{{
   ]
 }}'
 ```"#);
-
-    let listener = TcpListener::bind(HOST_ADDR).await.unwrap();
-
-    axum::serve(listener, app).await.unwrap();
-}
-
-async fn chat(Json(payload): Json<ChatRequest>) -> Sse<impl Stream<Item = Result<Event, Error>>> {
-    Sse::new(
-        API.chat_streamed(&payload).await.unwrap()
-            .map_ok(|res| Event::default().json_data(res).unwrap()),
-    )
 }
