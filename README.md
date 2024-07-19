@@ -14,7 +14,7 @@ cargo add ollama-rest@0.1
 
 ## At a glance
 
-> See [source](./examples/one-time-chat.rs) of this example.
+> See [source](./examples/generate_streamed.rs) of this example.
 
 ```rust
 use std::io::Write;
@@ -30,20 +30,17 @@ let request = serde_json::from_value::<GenerationRequest>(json!({
     "prompt": "Why is the sky blue?",
 })).unwrap();
 
-let final_res = ollama.generate(
-    &request,
-    // Handle streamed response
-    Some(|res: &GenerationResponse| {
-        if !res.done {
-            print!("{}", res.response);
-            // Flush stdout for each word to allow realtime output
-            std::io::stdout().flush().unwrap();
-        }
-    })
-).await.unwrap();
+let mut stream = ollama.generate_streamed(&request).await.unwrap();
 
-println!("\n\nFinal response:");
-println!("{final_res:?}");
+while let Some(Ok(res)) = stream.next().await {
+    if !res.done {
+        print!("{}", res.response);
+        // Flush stdout for each word to allow realtime output
+        std::io::stdout().flush().unwrap();
+    }
+}
+
+println!();
 ```
 
 Or, make your own chatbot interface! See [this example](./examples/interactive-chat.rs).
