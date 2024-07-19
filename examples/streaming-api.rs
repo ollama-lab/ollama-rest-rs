@@ -1,4 +1,4 @@
-//! This example shows how to build a simple REST API for relaying requests and streamed responses.
+//! This example shows how to build a simple REST API for relaying requests to and streamed responses from Ollama.
 //!
 //! [Axum](https://github.com/tokio-rs/axum) is used for Server-Sent Events (SSE).
 
