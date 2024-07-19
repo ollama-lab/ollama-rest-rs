@@ -1,6 +1,8 @@
-//! This example shows how to build a simple REST API for relaying requests to and streamed responses from Ollama.
+//! This example shows how to build a simple REST API for relaying requests to and
+//! streamed responses from Ollama.
 //!
-//! [Axum](https://github.com/tokio-rs/axum) is used for Server-Sent Events (SSE).
+//! This example uses [Server-Sent Events (SSE)](https://en.wikipedia.org/wiki/Server-sent_events)
+//! for realtime JSON streaming.
 
 use axum::{response::{sse::Event, Sse}, routing::post, Json, Router};
 use futures::{Stream, TryStreamExt};
