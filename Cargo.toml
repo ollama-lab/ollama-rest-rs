@@ -17,7 +17,9 @@ tokio = { version = "1", features = ["fs"] }
 url = { version = "2.5" }
 
 [dev-dependencies]
-tokio = { version = "1", features = ["rt", "macros", "rt-multi-thread"] }
+axum = { version = "0.7", features = ["tokio"] }
+lazy_static = "1.5"
+tokio = { version = "1", features = ["rt", "macros", "net", "rt-multi-thread"] }
 
 [features]
 default = []
