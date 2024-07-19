@@ -43,4 +43,4 @@ while let Some(Ok(res)) = stream.next().await {
 println!();
 ```
 
-Or, make your own chatbot interface! See [this example](./examples/interactive-chat.rs).
+Or, make your own chatbot interface! See [this example](./examples/interactive-chat_streamed.rs).
