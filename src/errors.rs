@@ -1,5 +1,7 @@
 //! Error module
 
+use std::fmt::Display;
+
 use reqwest::StatusCode;
 
 #[derive(Debug)]
@@ -14,6 +16,14 @@ pub enum Error {
     UrlParsing(url::ParseError),
     JsonDecoding(serde_json::Error),
 }
+
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{self}")
+    }
+}
+
+impl std::error::Error for Error {}
 
 impl From<reqwest::Error> for Error {
     fn from(value: reqwest::Error) -> Self {
