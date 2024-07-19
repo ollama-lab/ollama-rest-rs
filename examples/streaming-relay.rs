@@ -6,15 +6,13 @@
 
 use axum::{response::{sse::Event, Sse}, routing::post, Json, Router};
 use futures::{Stream, TryStreamExt};
-use lazy_static::lazy_static;
 use ollama_rest::{errors::Error, models::chat::ChatRequest, Ollama};
+use once_cell::sync::Lazy;
 use tokio::net::TcpListener;
 
 const HOST_ADDR: &str = "127.0.0.1:9890";
 
-lazy_static! {
-    static ref API: Ollama = Ollama::default();
-}
+static API: Lazy<Ollama> = Lazy::new(|| Ollama::default());
 
 #[tokio::main]
 async fn main() {
