@@ -255,6 +255,8 @@ impl Ollama {
     ///
     /// ## Parameters
     /// - `digest`: SHA256 digest of the blob
+    ///     **Be aware**: Currently the digest will be directly appended into the URL
+    ///     without sanitization, please don't expose digest input to end user side.
     ///
     /// ## Returns
     /// - `Ok(())`: Blob exists
@@ -277,6 +279,8 @@ impl Ollama {
     ///
     /// ## Parameters
     /// - `digest`: SHA256 digest of the blob
+    ///     **Be aware**: Currently the digest will be directly appended into the URL
+    ///     without sanitization, please don't expose digest input to end user side.
     /// - `file`: Tokio File instance
     ///
     /// ## Returns
