@@ -11,6 +11,9 @@ async fn main() {
 
     let mut prev_status = String::new();
 
+    // Callback API
+    //
+    // For Stream API, see `Ollama::pull_model_streamed()`.
     ollama.pull_model(&serde_json::from_value::<ModelSyncRequest>(serde_json::json!({
         "name": MODEL_NAME,
     })).unwrap(), Some(|res: &ModelPullStatus| {
