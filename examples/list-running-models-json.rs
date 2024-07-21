@@ -7,10 +7,5 @@ async fn main() {
 
     let models = ollama.running_models().await.unwrap();
     
-    println!("Models online");
-    println!("==========");
-
-    for model in models.models.iter() {
-        println!("{}", model.name);
-    }
+    println!("{models:#?}");
 }

@@ -6,11 +6,6 @@ async fn main() {
     let ollama = Ollama::default();
 
     let models = ollama.local_models().await.unwrap();
-
-    println!("Models installed");
-    println!("==========");
-
-    for model in models.models.iter() {
-        println!("{}", model.name);
-    }
+    
+    println!("{models:#?}");
 }
