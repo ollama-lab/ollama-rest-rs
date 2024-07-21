@@ -41,13 +41,8 @@ async fn main() {
         }
     ).await.unwrap();
 
-    let mut prev_status = String::new();
-
     while let Some(Ok(res)) = stream.next().await {
-        if !prev_status.starts_with(res.status.as_str()) {
-            prev_status = res.status.clone();
-            println!("\n{}", res.status);
-        }
+        println!("\n{}", res.status);
     }
 }
 
