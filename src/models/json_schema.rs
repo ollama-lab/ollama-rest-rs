@@ -6,17 +6,23 @@ use serde::{Deserialize, Serialize};
 pub struct FunctionDef {
     pub name: String,
     pub description: Option<String>,
-    pub parameters: Option<Box<TypeDef>>,
+    pub parameters: Option<Box<DataStructure>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
-pub enum TypeDef {
+pub enum DataStructure {
     Function {
         function: FunctionDef,
     },
+    Integer {
+        description: Option<String>,
+    },
+    Number {
+        description: Option<String>,
+    },
     Object {
-        properties: BTreeMap<String, TypeDef>,
+        properties: BTreeMap<String, DataStructure>,
         required: Option<Vec<String>>,
     },
     String {

@@ -4,7 +4,7 @@ use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use super::{errors::ParsingError, json_schema::TypeDef, RequestFormat};
+use super::{errors::ParsingError, json_schema::DataStructure, RequestFormat};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -64,7 +64,7 @@ pub struct ChatRequest {
     pub options: Option<Map<String, Value>>,
     pub stream: Option<bool>,
     pub keep_alive: Option<String>,
-    pub tools: Option<Vec<TypeDef>>,
+    pub tools: Option<Vec<DataStructure>>,
 }
 
 /// Chat completion response
