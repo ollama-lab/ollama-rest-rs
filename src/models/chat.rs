@@ -42,7 +42,7 @@ impl FromStr for Role {
 pub enum ToolCall {
     Function {
         name: String,
-        arguments: BTreeMap<String, String>,
+        arguments: BTreeMap<String, Value>,
     },
 }
 
