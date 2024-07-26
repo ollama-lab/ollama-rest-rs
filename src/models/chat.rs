@@ -1,18 +1,16 @@
-use std::{fmt::Display, str::FromStr};
+use std::{collections::BTreeMap, fmt::Display, str::FromStr};
 
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use super::{errors::ParsingError, RequestFormat};
+use super::{errors::ParsingError, json_schema::DataStructure, RequestFormat};
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Role {
-    #[serde(rename = "system")]
     System,
-    #[serde(rename = "user")]
     User,
-    #[serde(rename = "assistant")]
     Assistant,
 }
 
@@ -40,10 +38,23 @@ impl FromStr for Role {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ToolCall {
+    Function {
+        name: String,
+        arguments: BTreeMap<String, Value>,
+    },
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Message {
     pub role: Role,
     pub content: String,
     pub images: Option<Vec<String>>,
+    /// Tool calls
+    ///
+    /// Since 0.3.0
+    pub tool_calls: Option<Vec<ToolCall>>,
 }
 
 /// Chat completion request
@@ -56,6 +67,10 @@ pub struct ChatRequest {
     pub options: Option<Map<String, Value>>,
     pub stream: Option<bool>,
     pub keep_alive: Option<String>,
+    /// Tool definition
+    ///
+    /// Since 0.3.0
+    pub tools: Option<Vec<DataStructure>>,
 }
 
 /// Chat completion response

@@ -9,8 +9,23 @@ and [chrono](https://github.com/chronotope/chrono).
 ## Install
 
 ```bash
-cargo add ollama-rest@0.1
+cargo add ollama-rest@0.3
 ```
+
+## Features
+
+|    name        |     status      |
+|----------------|-----------------|
+| Completion     | Working ✅      |
+| Embedding      | Working ✅      |
+| Model creation | Working ✅      |
+| Model deletion | Working ✅      |
+| Model pulling  | Working ✅      |
+| Model copying  | Working ✅      |
+| Local models   | Working ✅      |
+| Running models | Working ✅      |
+| Model pushing  | Experimental 🧪 |
+| Tools          | Experimental 🧪 |
 
 ## At a glance
 
@@ -44,3 +59,4 @@ println!();
 ```
 
 Or, make your own chatbot interface! See [this example](./examples/interactive-chat_streamed.rs) (CLI) and [this example](./examples/streaming-relay.rs) (REST API).
+

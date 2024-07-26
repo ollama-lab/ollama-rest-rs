@@ -10,15 +10,16 @@ pub mod create;
 pub mod embeddings;
 pub mod errors;
 pub mod generate;
+pub mod json_schema;
 pub mod model;
 
 /// Request format
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum RequestFormat {
     /// JSON
     ///
     /// Currently the one and only format support by Ollama
-    #[serde(rename = "json")]
     Json,
 }
 
