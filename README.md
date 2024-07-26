@@ -12,6 +12,21 @@ and [chrono](https://github.com/chronotope/chrono).
 cargo add ollama-rest@0.3
 ```
 
+## Features
+
+|    name        |     status      |
+|----------------|-----------------|
+| Completion     | Working ✅      |
+| Embedding      | Working ✅      |
+| Model creation | Working ✅      |
+| Model deletion | Working ✅      |
+| Model pulling  | Working ✅      |
+| Model copying  | Working ✅      |
+| Local models   | Working ✅      |
+| Running models | Working ✅      |
+| Model pushing  | Experimental 🧪 |
+| Tools          | Experimental 🧪 |
+
 ## At a glance
 
 > See [source](./examples/generate_streamed.rs) of this example.
@@ -44,3 +59,4 @@ println!();
 ```
 
 Or, make your own chatbot interface! See [this example](./examples/interactive-chat_streamed.rs) (CLI) and [this example](./examples/streaming-relay.rs) (REST API).
+
