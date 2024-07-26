@@ -683,7 +683,7 @@ dependencies = [
 
 [[package]]
 name = "ollama-rest"
-version = "0.2.0-dev.1"
+version = "0.3.0-dev.1"
 dependencies = [
  "axum",
  "chrono",
