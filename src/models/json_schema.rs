@@ -2,6 +2,9 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+/// Function definition
+///
+/// Since 0.3.0
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FunctionDef {
     pub name: String,
@@ -9,6 +12,10 @@ pub struct FunctionDef {
     pub parameters: Option<Box<DataStructure>>,
 }
 
+/// Partially implemented data structure definition
+/// used in JSON schema
+///
+/// Since 0.3.0
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum DataStructure {
