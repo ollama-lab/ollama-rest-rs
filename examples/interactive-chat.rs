@@ -43,6 +43,7 @@ async fn main() {
             role: Role::User,
             content: prompt,
             images: None,
+            tool_calls: None,
         });
 
         let mut completion = String::new();
@@ -70,6 +71,7 @@ async fn main() {
             role: Role::Assistant,
             content: completion,
             images: None,
+            tool_calls: None,
         });
     }
 }
