@@ -7,7 +7,7 @@ async fn main() {
 
     ollama.copy_model(
         &ModelCopyRequest {
-            source: "llama3".to_string(),
+            source: "llama3.2:1b".to_string(),
             destination: "rest-test-foobar".to_string(),
         },
     ).await.unwrap();

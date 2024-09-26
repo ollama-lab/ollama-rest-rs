@@ -1,6 +1,6 @@
 # ollama-rest.rs
 
-Asynchronous Rust bindings of Ollama REST API,
+Asynchronous Rust bindings of [Ollama REST API](https://github.com/ollama/ollama/blob/main/docs/api.md),
 using [reqwest](https://github.com/seanmonstar/reqwest),
 [tokio](https://tokio.rs),
 [serde](https://serde.rs/),
@@ -16,14 +16,14 @@ cargo add ollama-rest@0.3
 
 |    name        |     status      |
 |----------------|-----------------|
-| Completion     | Working ✅      |
-| Embedding      | Working ✅      |
-| Model creation | Working ✅      |
-| Model deletion | Working ✅      |
-| Model pulling  | Working ✅      |
-| Model copying  | Working ✅      |
-| Local models   | Working ✅      |
-| Running models | Working ✅      |
+| Completion     | Supported ✅    |
+| Embedding      | Supported ✅    |
+| Model creation | Supported ✅    |
+| Model deletion | Supported ✅    |
+| Model pulling  | Supported ✅    |
+| Model copying  | Supported ✅    |
+| Local models   | Supported ✅    |
+| Running models | Supported ✅    |
 | Model pushing  | Experimental 🧪 |
 | Tools          | Experimental 🧪 |
 
@@ -41,7 +41,7 @@ use serde_json::json;
 let ollama = Ollama::default();
 
 let request = serde_json::from_value::<GenerationRequest>(json!({
-    "model": "llama3",
+    "model": "llama3.2:1b",
     "prompt": "Why is the sky blue?",
 })).unwrap();
 

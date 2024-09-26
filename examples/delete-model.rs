@@ -2,8 +2,8 @@ use std::io::Write;
 
 use ollama_rest::{prelude::*, Ollama};
 
-// Use qwen2:0.5b because it is good for demonstration due to its size.
-const MODEL_NAME: &str = "qwen2:0.5b";
+// Use llama3.2:1b because it is good for demonstration due to its size.
+const MODEL_NAME: &str = "llama3.2:1b";
 
 #[tokio::main]
 async fn main() {

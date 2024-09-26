@@ -7,7 +7,7 @@ use std::io::{BufRead, Write};
 use ollama_rest::{prelude::*, Ollama};
 use serde_json::json;
 
-const MODEL_NAME: &str = "llama3";
+const MODEL_NAME: &str = "llama3.2:1b";
 
 #[tokio::main]
 async fn main() {
