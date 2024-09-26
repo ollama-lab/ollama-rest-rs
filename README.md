@@ -16,14 +16,14 @@ cargo add ollama-rest@0.3
 
 |    name        |     status      |
 |----------------|-----------------|
-| Completion     | Working ✅      |
-| Embedding      | Working ✅      |
-| Model creation | Working ✅      |
-| Model deletion | Working ✅      |
-| Model pulling  | Working ✅      |
-| Model copying  | Working ✅      |
-| Local models   | Working ✅      |
-| Running models | Working ✅      |
+| Completion     | Yes ✅          |
+| Embedding      | Yes ✅          |
+| Model creation | Yes ✅          |
+| Model deletion | Yes ✅          |
+| Model pulling  | Yes ✅          |
+| Model copying  | Yes ✅          |
+| Local models   | Yes ✅          |
+| Running models | Yes ✅          |
 | Model pushing  | Experimental 🧪 |
 | Tools          | Experimental 🧪 |
 
