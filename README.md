@@ -1,6 +1,6 @@
 # ollama-rest.rs
 
-Asynchronous Rust bindings of Ollama REST API,
+Asynchronous Rust bindings of [Ollama REST API](https://github.com/ollama/ollama/blob/main/docs/api.md),
 using [reqwest](https://github.com/seanmonstar/reqwest),
 [tokio](https://tokio.rs),
 [serde](https://serde.rs/),
