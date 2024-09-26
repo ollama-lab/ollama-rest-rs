@@ -7,7 +7,6 @@ use std::io::{BufRead, Write};
 use futures::StreamExt;
 use ollama_rest::{prelude::*, Ollama};
 use serde_json::json;
-
 const MODEL_NAME: &str = "llama3";
 
 #[tokio::main]
@@ -44,6 +43,7 @@ async fn main() {
             role: Role::User,
             content: prompt,
             images: None,
+            tool_calls: None,
         });
 
         let mut completion = String::new();
@@ -75,6 +75,7 @@ async fn main() {
             role: Role::Assistant,
             content: completion,
             images: None,
+            tool_calls: None,
         });
     }
 }
