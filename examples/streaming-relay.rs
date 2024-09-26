@@ -44,7 +44,7 @@ HOW TO USE THIS EXAMPLE:
 For example:
 ```
 curl -X POST http://127.0.0.1:9890/ -H 'Content-Type: application/json' -d '{{
-  "model": "llama3",
+  "model": "llama3.2:1b",
   "messages": [
     {{
       "role": "user",

@@ -8,7 +8,7 @@ async fn main() {
     let res = ollama.generate_embeddings(
         // Or use `serde_json::json` macro to convert JSON to the model
         &EmbeddingGenerationRequest {
-            model: "llama3".to_string(),
+            model: "llama3.2:1b".to_string(),
             prompt: "How are you today?".to_string(),
             options: None,
             keep_alive: None,

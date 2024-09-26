@@ -15,7 +15,7 @@ async fn main() {
     let ollama = Ollama::default();
 
     let request = serde_json::from_value::<GenerationRequest>(json!({
-        "model": "llama3",
+        "model": "llama3.2:1b",
         "prompt": "Why is the sky blue?",
     })).unwrap();
 
