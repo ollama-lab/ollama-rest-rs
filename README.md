@@ -9,7 +9,7 @@ and [chrono](https://github.com/chronotope/chrono).
 ## Install
 
 ```bash
-cargo add ollama-rest@0.3
+cargo add ollama-rest@0.5
 ```
 
 ## Features
