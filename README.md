@@ -1,8 +1,5 @@
 # ollama-rest.rs
 
->[!WARNING]
-> **Deprecated**: Use [ollama-rs](https://github.com/pepperoni21/ollama-rs) instead
-
 Asynchronous Rust bindings of [Ollama REST API](https://github.com/ollama/ollama/blob/main/docs/api.md),
 using [reqwest](https://github.com/seanmonstar/reqwest),
 [tokio](https://tokio.rs),
