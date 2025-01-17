@@ -19,6 +19,10 @@ pub mod errors;
 pub mod models;
 pub mod prelude;
 
+// Re-exports
+pub use chrono;
+pub use futures;
+
 macro_rules! streamed_request_wrapper {
     {
         $(
