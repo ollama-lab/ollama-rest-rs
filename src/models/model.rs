@@ -34,13 +34,13 @@ pub struct ModelShowRequest {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ModelShowResponse {
-    pub modelfile: String,
-    pub parameters: String,
-    pub template: String,
+    pub modelfile: Option<String>,
+    pub parameters: Option<String>,
+    pub template: Option<String>,
 
-    pub details: ModelDetails,
+    pub details: Option<ModelDetails>,
 
-    pub model_info: Map<String, serde_json::Value>,
+    pub model_info: Option<Map<String, serde_json::Value>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
