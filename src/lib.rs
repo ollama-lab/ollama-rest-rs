@@ -198,6 +198,7 @@ macro_rules! streamed_request_wrapper {
 ///
 /// // ...
 /// ```
+#[derive(Clone)]
 pub struct Ollama {
     host: Url,
     client: Client,
