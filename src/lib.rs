@@ -17,7 +17,6 @@ use tokio::fs::File;
 
 pub mod errors;
 pub mod models;
-pub mod prelude;
 
 // Re-exports
 pub use chrono;
