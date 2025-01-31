@@ -12,6 +12,7 @@ pub mod errors;
 pub mod generate;
 pub mod json_schema;
 pub mod model;
+pub mod version;
 
 /// Request format
 #[derive(Debug, Serialize, Deserialize)]
