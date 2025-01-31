@@ -4,7 +4,7 @@
 
 use std::io::{BufRead, Write};
 
-use ollama_rest::{prelude::*, Ollama};
+use ollama_rest::{models::chat::{ChatRequest, ChatResponse, Message, Role}, Ollama};
 use serde_json::json;
 
 const MODEL_NAME: &str = "llama3.2:1b";

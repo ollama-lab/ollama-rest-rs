@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use futures::StreamExt;
-use ollama_rest::{prelude::*, Ollama};
+use ollama_rest::{models::model::ModelSyncRequest, Ollama};
 
 // Use llama3.2:1b because it is good for demonstration due to its size.
 const MODEL_NAME: &str = "llama3.2:1b";
