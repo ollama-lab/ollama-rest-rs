@@ -5,19 +5,13 @@ use std::str::FromStr;
 use errors::Error;
 use futures::{Stream, StreamExt};
 use models::{
-    chat::{ChatRequest, ChatResponse},
-    create::CreationRequest,
-    embeddings::{EmbeddingGenerationRequest, EmbeddingGenerationResponse},
-    generate::{GenerationRequest, GenerationResponse},
-    model::*,
-    Status
+    chat::{ChatRequest, ChatResponse}, create::CreationRequest, embeddings::{EmbeddingGenerationRequest, EmbeddingGenerationResponse}, generate::{GenerationRequest, GenerationResponse}, model::*, version::VersionResponse, Status
 };
 use reqwest::{Client, ClientBuilder, StatusCode, Url};
 use tokio::fs::File;
 
 pub mod errors;
 pub mod models;
-pub mod prelude;
 
 // Re-exports
 pub use chrono;
@@ -398,6 +392,14 @@ impl Ollama {
             .send()
             .await?
             .json::<RunningModelResponse>()
+            .await?)
+    }
+
+    pub async fn version(&self) -> Result<VersionResponse, Error> {
+        Ok(self.client.get(self.host.join("/api/version")?)
+            .send()
+            .await?
+            .json::<VersionResponse>()
             .await?)
     }
 }

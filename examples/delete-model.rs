@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use ollama_rest::{prelude::*, Ollama};
+use ollama_rest::{models::model::ModelDeletionRequest, Ollama};
 
 // Use llama3.2:1b because it is good for demonstration due to its size.
 const MODEL_NAME: &str = "llama3.2:1b";
