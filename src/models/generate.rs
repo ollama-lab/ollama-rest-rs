@@ -9,6 +9,7 @@ use super::RequestFormat;
 pub struct GenerationRequest {
     pub model: String,
     pub prompt: String,
+    pub suffix: Option<String>,
     pub images: Option<Vec<String>>,
 
     pub format: Option<RequestFormat>,
