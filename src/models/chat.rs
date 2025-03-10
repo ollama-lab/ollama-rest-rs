@@ -14,13 +14,26 @@ pub enum Role {
     Assistant,
 }
 
-impl Display for Role {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match self {
+impl Role {
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::System => "system",
             Self::User => "user",
             Self::Assistant => "assistant",
-        })
+        }
+    }
+}
+
+impl AsRef<str> for Role {
+    #[inline]
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl Display for Role {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.as_str())
     }
 }
 
