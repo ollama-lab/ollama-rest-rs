@@ -1,6 +1,6 @@
 [package]
 name = "ollama-rest"
-version = "0.5.6"
+version = "0.5.7"
 edition = "2021"
 description = "Asynchronous Rust bindings of Ollama REST API"
 authors = ["Charles Dong <chardon_cs@proton.me>"]
