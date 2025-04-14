@@ -4,7 +4,7 @@ use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use super::{errors::ParsingError, json_schema::DataStructure, RequestFormat};
+use super::{errors::ParsingError, json_schema::JsonSchema, RequestFormat};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -12,6 +12,7 @@ pub enum Role {
     System,
     User,
     Assistant,
+    Tool,
 }
 
 impl Role {
@@ -20,6 +21,7 @@ impl Role {
             Self::System => "system",
             Self::User => "user",
             Self::Assistant => "assistant",
+            Self::Tool => "tool",
         }
     }
 }
@@ -45,6 +47,7 @@ impl FromStr for Role {
             "system" => Role::System,
             "user" => Role::User,
             "assistant" => Role::Assistant,
+            "tool" => Role::Tool,
             _ => Err(ParsingError::InvalidStr)?,
         })
     }
@@ -83,7 +86,7 @@ pub struct ChatRequest {
     /// Tool definition
     ///
     /// Since 0.3.0
-    pub tools: Option<Vec<DataStructure>>,
+    pub tools: Option<Vec<JsonSchema>>,
 }
 
 /// Chat completion response
