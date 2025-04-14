@@ -44,22 +44,22 @@ mod tests {
 
     #[test]
     fn def_function_schema() {
-        let func_name = "query_weather";
-        let func_description = "Get current weather in a specified location.";
+        const FUNC_NAME: &'static str = "query_weather";
+        const FUNC_DESC: &'static str = "Get current weather in a specified location.";
 
-        let location_description = "Keywords of the location.";
+        const LOC_DESC: &'static str = "Keywords of the location.";
 
         let obj = serde_json::from_value::<JsonSchema>(serde_json::json!({
             "type": "function",
             "function": {
-                "name": func_name,
-                "description": func_description,
+                "name": FUNC_NAME,
+                "description": FUNC_DESC,
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "location": {
                             "type": "string",
-                            "description": location_description,
+                            "description": LOC_DESC,
                         },
                     },
                     "required": ["location"],
@@ -70,10 +70,10 @@ mod tests {
         assert!(matches!(obj, JsonSchema::Function { .. }));
 
         if let JsonSchema::Function { function } = obj {
-            assert_eq!(function.name, func_name);
+            assert_eq!(function.name, FUNC_NAME);
 
             assert!(matches!(function.description, Some(_)));
-            assert_eq!(function.description.unwrap(), func_description);
+            assert_eq!(function.description.unwrap(), FUNC_DESC);
 
             assert!(matches!(function.parameters, Some(_)));
 
@@ -89,7 +89,7 @@ mod tests {
                         if let JsonSchema::String { description, enumeration } = location_schema {
                             assert!(matches!(description, Some(_)));
                             if let Some(description) = description {
-                                assert_eq!(description, location_description);
+                                assert_eq!(description, LOC_DESC);
                             }
 
                             assert!(matches!(enumeration, None));
