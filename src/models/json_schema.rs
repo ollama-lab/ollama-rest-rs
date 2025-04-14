@@ -37,3 +37,72 @@ pub enum JsonSchema {
         enumeration: Option<Vec<String>>,
     },
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn def_function_schema() {
+        let func_name = "query_weather";
+        let func_description = "Get current weather in a specified location.";
+
+        let location_description = "Keywords of the location.";
+
+        let obj = serde_json::from_value::<JsonSchema>(serde_json::json!({
+            "type": "function",
+            "function": {
+                "name": func_name,
+                "description": func_description,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "location": {
+                            "type": "string",
+                            "description": location_description,
+                        },
+                    },
+                    "required": ["location"],
+                },
+            },
+        })).unwrap();
+
+        assert!(matches!(obj, JsonSchema::Function { .. }));
+
+        if let JsonSchema::Function { function } = obj {
+            assert_eq!(function.name, func_name);
+
+            assert!(matches!(function.description, Some(_)));
+            assert_eq!(function.description.unwrap(), func_description);
+
+            assert!(matches!(function.parameters, Some(_)));
+
+            if let Some(boxed_schema) = function.parameters {
+                let param_schema = *boxed_schema;
+
+                assert!(matches!(param_schema, JsonSchema::Object { .. }));
+                if let JsonSchema::Object { properties, required } = param_schema {
+                    let location_schema = properties.get("location");
+                    assert!(matches!(location_schema, Some(_)));
+                    if let Some(location_schema) = location_schema {
+                        assert!(matches!(location_schema, JsonSchema::String { .. }));
+                        if let JsonSchema::String { description, enumeration } = location_schema {
+                            assert!(matches!(description, Some(_)));
+                            if let Some(description) = description {
+                                assert_eq!(description, location_description);
+                            }
+
+                            assert!(matches!(enumeration, None));
+                        }
+                    }
+
+                    assert!(matches!(required, Some(_)));
+                    if let Some(required_fields) = required {
+                        assert_eq!(required_fields.len(), 1);
+                        assert_eq!(required_fields[0], "location");
+                    }
+                }
+            }
+        }
+    }
+}
