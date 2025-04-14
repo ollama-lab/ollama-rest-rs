@@ -9,16 +9,15 @@ use serde::{Deserialize, Serialize};
 pub struct FunctionDef {
     pub name: String,
     pub description: Option<String>,
-    pub parameters: Option<Box<DataStructure>>,
+    pub parameters: Option<Box<JsonSchema>>,
 }
 
-/// Partially implemented data structure definition
-/// used in JSON schema
+/// A **partly** implemented JSON Schema object.
 ///
 /// Since 0.3.0
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
-pub enum DataStructure {
+pub enum JsonSchema {
     Function {
         function: FunctionDef,
     },
@@ -29,7 +28,7 @@ pub enum DataStructure {
         description: Option<String>,
     },
     Object {
-        properties: BTreeMap<String, DataStructure>,
+        properties: BTreeMap<String, JsonSchema>,
         required: Option<Vec<String>>,
     },
     String {
