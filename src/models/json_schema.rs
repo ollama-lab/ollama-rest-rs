@@ -12,7 +12,7 @@ pub struct FunctionDef {
     pub parameters: Option<Box<JsonSchema>>,
 }
 
-/// A **partly** implemented JSON Schema object.
+/// A **partly** implemented JSON Schema enum.
 ///
 /// Since 0.3.0
 #[derive(Debug, Serialize, Deserialize)]
