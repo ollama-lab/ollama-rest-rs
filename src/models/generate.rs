@@ -1,3 +1,4 @@
+#[cfg(feature = "chrono")]
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
@@ -27,7 +28,12 @@ pub struct GenerationRequest {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GenerationResponse {
     pub model: String,
+
+    #[cfg(feature = "chrono")]
     pub created_at: DateTime<Local>,
+    #[cfg(not(feature = "chrono"))]
+    pub created_at: String,
+
     pub response: String,
     pub done: bool,
     

@@ -1,5 +1,6 @@
 use std::{collections::BTreeMap, fmt::Display, str::FromStr};
 
+#[cfg(feature = "chrono")]
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
@@ -93,7 +94,12 @@ pub struct ChatRequest {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChatResponse {
     pub model: String,
+
+    #[cfg(feature = "chrono")]
     pub created_at: DateTime<Local>,
+    #[cfg(not(feature = "chrono"))]
+    pub created_at: String,
+
     pub message: Option<Message>,
     pub done: bool,
 
