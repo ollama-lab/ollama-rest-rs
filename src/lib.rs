@@ -14,6 +14,7 @@ pub mod errors;
 pub mod models;
 
 // Re-exports
+#[cfg(feature = "chrono")]
 pub use chrono;
 pub use futures;
 

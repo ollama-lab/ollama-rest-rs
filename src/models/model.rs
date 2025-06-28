@@ -1,3 +1,4 @@
+#[cfg(feature = "chrono")]
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use serde_json::Map;
@@ -15,7 +16,12 @@ pub struct ModelDetails {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Model {
     pub name: String,
+
+    #[cfg(feature = "chrono")]
     pub modified_at: DateTime<Local>,
+    #[cfg(not(feature = "chrono"))]
+    pub modified_at: String,
+
     pub size: usize,
     pub digest: String,
     pub details: ModelDetails,
@@ -97,7 +103,11 @@ pub struct RunningModel {
 
     pub details: ModelDetails,
 
+    #[cfg(feature = "chrono")]
     pub expires_at: DateTime<Local>,
+    #[cfg(not(feature = "chrono"))]
+    pub expires_at: String,
+
     pub size_vram: usize,
 }
 
