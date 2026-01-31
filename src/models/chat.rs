@@ -72,6 +72,8 @@ pub struct Message {
     ///
     /// Since 0.3.0
     pub tool_calls: Option<Vec<ToolCall>>,
+
+    pub thinking: Option<String>,
 }
 
 /// Chat completion request
@@ -88,6 +90,8 @@ pub struct ChatRequest {
     ///
     /// Since 0.3.0
     pub tools: Option<Vec<JsonSchema>>,
+
+    pub think: Option<bool>,
 }
 
 /// Chat completion response
