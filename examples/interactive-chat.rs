@@ -44,6 +44,7 @@ async fn main() {
             content: prompt,
             images: None,
             tool_calls: None,
+            thinking: None,
         });
 
         let mut completion = String::new();
@@ -72,6 +73,7 @@ async fn main() {
             content: completion,
             images: None,
             tool_calls: None,
+            thinking: None,
         });
     }
 }
